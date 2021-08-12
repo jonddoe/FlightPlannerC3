@@ -6,11 +6,9 @@ namespace FlightPlannerC3.Core.Dto
 {
     public class AddAirportRequest
     {
-        [Required, MaxLength(20)]
-        public string Country { get; set; }
+        [Required, MaxLength(20)] public string Country { get; set; }
 
-        [Required, MaxLength(20)]
-        public string City { get; set; }
+        [Required, MaxLength(20)] public string City { get; set; }
 
         [JsonPropertyName("airport"), Required, MaxLength(3), Column(TypeName = "varchar(3)")]
         public string AirportName { get; set; }

@@ -8,7 +8,6 @@ namespace FlightPlannerC3.Services.Validators
         public bool Validate(AddFlightRequest request)
         {
             return request.From != request.To;
-            
         }
 
         public bool Validate(SearchFlightsRequest request)

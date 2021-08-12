@@ -46,15 +46,9 @@ namespace FlightPlannerC3.Services
 
         public void Delete<T>(T entity) where T : Entity
         {
-            //not like this
-
             if (entity == null) return;
-
             Context.Set<T>().Remove(entity);
             Context.SaveChanges();
-
-
         }
-
     }
 }

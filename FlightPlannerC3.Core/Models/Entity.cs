@@ -4,8 +4,6 @@ namespace FlightPlannerC3.Core.Models
 {
     public abstract class Entity
     {
-       //[JsonIgnore]
-        [JsonPropertyName("id")]
-        public int Id { get; set; }
+         public int Id { get; set; }
     }
 }

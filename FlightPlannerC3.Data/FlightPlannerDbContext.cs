@@ -8,22 +8,14 @@ namespace FlightPlannerC3.Data
     {
         public FlightPlannerDbContext(DbContextOptions options) : base(options)
         {
-
         }
-
-       
 
         public async Task<int> SaveChangesAsync()
         {
             return await base.SaveChangesAsync();
         }
-        /*public EntityEntry<T> Entry<T>(T entity) where T : Entity
-        {
-            throw new System.NotImplementedException();
-        }*/
 
         public DbSet<Flight> Flights { get; set; }
         public DbSet<Airport> Airports { get; set; }
-
     }
 }
