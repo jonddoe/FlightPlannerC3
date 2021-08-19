@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using FlightPlannerC3.Core.Models;
 using FlightPlannerC3.Core.Services;

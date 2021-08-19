@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
@@ -7,6 +8,7 @@ using FlightPlannerC3.Core.Models;
 using FlightPlannerC3.Core.Services;
 using FlightPlannerC3.Data;
 using FlightPlannerC3.Models.Responses;
+using Microsoft.EntityFrameworkCore;
 
 namespace FlightPlannerC3.Controllers
 {
@@ -47,7 +49,6 @@ namespace FlightPlannerC3.Controllers
                 f.Country.ToLower().Contains(search)).ToList();
 
             return airportList.Count == 0 ? (IActionResult)NotFound() : Ok(airportsOut);
-            
         }
 
         [Route("flights/{id:int}")]
@@ -93,14 +94,20 @@ namespace FlightPlannerC3.Controllers
                     return BadRequest();
                 }
 
-                var flightsList = _context.Flights.ToList();
+                var flight = _context.Flights
+                    .Include(f => f.From)
+                    .Include(f => f.To).FirstOrDefault(f =>
+                        f.DepartureTime.Substring(0, 10) == request.DepartureDate &&
+                        f.From.AirportName == request.From &&
+                        f.To.AirportName == request.To);
+                var flightList = new List<Flight>();
 
-                var flights = flightsList.Where(f =>
-                    f.From.AirportName == request.From &&
-                    f.To.AirportName == request.To &&
-                    f.DepartureTime[..10] == request.DepartureDate).ToList();
+                if (flight != null)
+                {
+                    flightList.Add(flight);
+                }
 
-                var page = new PageResult(flights);
+                var page = new PageResult(flightList);
                 return Ok(page);
             }
         }

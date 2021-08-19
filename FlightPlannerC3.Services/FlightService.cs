@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Linq.Expressions;
+﻿using System.Linq;
 using System.Threading.Tasks;
 using FlightPlannerC3.Core.Models;
 using FlightPlannerC3.Core.Services;
@@ -14,14 +11,12 @@ namespace FlightPlannerC3.Services
     public class FlightService : EntityService<Flight>, IFlightService
     {
         private readonly FlightPlannerDbContext _context;
-        private readonly DbSet<Flight> _db;
 
 
         public FlightService(FlightPlannerDbContext context) : base(context)
         {
             _context = context;
-
-            _db = _context.Set<Flight>();
+            _context.Set<Flight>();
         }
 
         public async Task<Flight> GetFullFlight(int id)
@@ -30,10 +25,8 @@ namespace FlightPlannerC3.Services
                 .Include(f => f.From)
                 .Include(f => f.To).FirstOrDefault(x => x.Id == id);
 
-
             return flight;
         }
-
 
         public async Task DeleteFlightById(int id)
         {
@@ -42,25 +35,10 @@ namespace FlightPlannerC3.Services
             await _context.SaveChangesAsync();
         }
 
-
-        public async Task<IEnumerable<Flight>> GetFlights(Expression<Func<Flight, bool>> expression,
-            List<string> includes = null)
-        {
-            IQueryable<Flight> query = _db;
-            if (includes != null)
-            {
-                query = includes.Aggregate(query, (current, p) => current.Include(p));
-            }
-
-            return await query.AsNoTracking().ToListAsync();
-        }
-
-
         public async Task DeleteFlights()
         {
             _context.Flights.RemoveRange(_context.Flights);
             _context.Airports.RemoveRange(_context.Airports);
-
             await _context.SaveChangesAsync();
         }
     }

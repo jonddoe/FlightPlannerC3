@@ -23,7 +23,7 @@ namespace FlightPlannerC3.Services.Validators
                 return false;
             }
 
-            return !(DateTime.Parse(request.ArrivalTime) <= DateTime.Parse(request.DepartureTime));
+            return DateTime.Parse(request.ArrivalTime) > DateTime.Parse(request.DepartureTime);
         }
 
         public bool Validate(SearchFlightsRequest request)
