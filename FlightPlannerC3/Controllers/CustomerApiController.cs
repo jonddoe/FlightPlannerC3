@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
@@ -7,13 +8,14 @@ using FlightPlannerC3.Core.Models;
 using FlightPlannerC3.Core.Services;
 using FlightPlannerC3.Data;
 using FlightPlannerC3.Models.Responses;
+using Microsoft.EntityFrameworkCore;
 
 namespace FlightPlannerC3.Controllers
 {
     [Route("api")]
     public class CustomerApiController : ControllerBase
     {
-        public CustomerApiController(FlightPlannerDbContext context , IEnumerable<IInputValidator> validators,
+        public CustomerApiController(FlightPlannerDbContext context, IEnumerable<IInputValidator> validators,
             IFlightService flightService)
         {
             _context = context;
@@ -30,16 +32,13 @@ namespace FlightPlannerC3.Controllers
         [HttpGet]
         public async Task<IActionResult> SearchAirports(string search)
         {
-            //do i need locker here? 
-            //lock (Locker)
-            //{
             search = search.ToLower().Trim();
             var airportList = _context.Airports.ToList();
             var noIdAirportList = airportList.Select(a =>
                     new AirportOut
                     {
-                        Country = a.Country, 
-                        City = a.City, 
+                        Country = a.Country,
+                        City = a.City,
                         AirportName = a.AirportName
                     })
                 .ToList();
@@ -49,61 +48,66 @@ namespace FlightPlannerC3.Controllers
                 f.City.ToLower().Contains(search) ||
                 f.Country.ToLower().Contains(search)).ToList();
 
-            return airportList.Count == 0 ? (IActionResult) NotFound() : Ok(airportsOut);
-            // }
+            return airportList.Count == 0 ? (IActionResult)NotFound() : Ok(airportsOut);
         }
 
         [Route("flights/{id:int}")]
         [HttpGet]
         public IActionResult GetFlightById(int id)
         {
+            var s = _flightService.GetFullFlight(id);
+            if (s.Result == null)
+            {
+                return NotFound();
+            }
 
-            /*var flightsList = _context.Flights.ToList();
-            var noIdFlightList = flightsList.Select(f =>
-                new FlightOut
+            var flightWithNoId = new FlightOut
+            {
+                From = new AirportOut
                 {
-                    From = new AirportOut()
-                    {
-                        AirportName = f.From.AirportName,
-                        City = f.From.City,
-                        Country = f.From.Country
-                    },
-                    To = new AirportOut()
-                    {
-                        AirportName = f.To.AirportName,
-                        City = f.To.City,
-                        Country = f.To.Country
-                    },
-                    Carrier = f.Carrier,
-                    DepartureTime = f.DepartureTime,
-                    ArrivalTime = f.ArrivalTime,
-                }).ToList();*/
-           
-
-            var s= _flightService.GetFullFlight(id);
-
-
-            return s.Result== null ? (IActionResult) NotFound() : Ok(s.Result);
+                    Country = s.Result.From.Country,
+                    City = s.Result.From.City,
+                    AirportName = s.Result.From.AirportName
+                },
+                To = new AirportOut
+                {
+                    Country = s.Result.To.Country,
+                    City = s.Result.To.City,
+                    AirportName = s.Result.To.AirportName
+                },
+                Carrier = s.Result.Carrier,
+                DepartureTime = s.Result.DepartureTime,
+                ArrivalTime = s.Result.ArrivalTime,
+                Id = s.Result.Id
+            };
+            return Ok(flightWithNoId);
         }
 
         [Route("flights/search")]
         [HttpPost]
-        public IActionResult FindFlight(/*[FromBody]*/ SearchFlightsRequest request)
+        public IActionResult FindFlight([FromBody] SearchFlightsRequest request)
         {
             lock (Locker)
             {
-                if (request==null||_validators.Any(v => v.Validate(request) == false))
+                if (request == null || _validators.Any(v => v.Validate(request) == false))
                 {
                     return BadRequest();
                 }
-                var flightsList = _context.Flights.ToList();
 
-                var flights = flightsList.Where(f =>
-                    f.From.AirportName == request.From &&
-                    f.To.AirportName == request.To &&
-                    f.DepartureTime[..10] == request.DepartureDate).ToList();
+                var flight = _context.Flights
+                    .Include(f => f.From)
+                    .Include(f => f.To).FirstOrDefault(f =>
+                        f.DepartureTime.Substring(0, 10) == request.DepartureDate &&
+                        f.From.AirportName == request.From &&
+                        f.To.AirportName == request.To);
+                var flightList = new List<Flight>();
 
-                var page = new PageResult(flights);
+                if (flight != null)
+                {
+                    flightList.Add(flight);
+                }
+
+                var page = new PageResult(flightList);
                 return Ok(page);
             }
         }

@@ -10,7 +10,6 @@ namespace FlightPlannerC3.Services
     {
         public EntityService(FlightPlannerDbContext context) : base(context)
         {
-
         }
 
         public IQueryable<T> Query()
@@ -42,7 +41,5 @@ namespace FlightPlannerC3.Services
         {
             Delete<T>(entity);
         }
-
-
     }
 }

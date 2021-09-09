@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using FlightPlannerC3.Core.Models;
 using FlightPlannerC3.Core.Services;
@@ -46,15 +45,9 @@ namespace FlightPlannerC3.Services
 
         public void Delete<T>(T entity) where T : Entity
         {
-            //not like this
-
             if (entity == null) return;
-
             Context.Set<T>().Remove(entity);
             Context.SaveChanges();
-
-
         }
-
     }
 }

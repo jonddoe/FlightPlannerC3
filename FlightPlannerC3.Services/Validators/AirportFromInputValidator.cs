@@ -12,14 +12,7 @@ namespace FlightPlannerC3.Services.Validators
 
         public bool Validate(SearchFlightsRequest request)
         {
-            return request.From!=null;
+            return request.From != null;
         }
-
-        /*private static bool Validate(string requestFrom)
-        {
-            while (true)
-            {
-            }
-        }*/
     }
 }

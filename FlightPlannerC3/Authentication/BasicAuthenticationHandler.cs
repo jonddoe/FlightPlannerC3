@@ -10,14 +10,13 @@ using Microsoft.Extensions.Options;
 
 namespace FlightPlannerC3.Authentication
 {
-
     public class BasicAuthenticationHandler : AuthenticationHandler<AuthenticationSchemeOptions>
     {
         public BasicAuthenticationHandler(
-            IOptionsMonitor<AuthenticationSchemeOptions> options, 
+            IOptionsMonitor<AuthenticationSchemeOptions> options,
             ILoggerFactory logger,
-            UrlEncoder encoder, 
-            ISystemClock clock) 
+            UrlEncoder encoder,
+            ISystemClock clock)
             : base(options, logger, encoder, clock)
         {
         }

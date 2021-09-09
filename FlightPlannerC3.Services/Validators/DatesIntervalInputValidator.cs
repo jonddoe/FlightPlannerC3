@@ -7,20 +7,12 @@ namespace FlightPlannerC3.Services.Validators
     public class DatesIntervalInputValidator : IInputValidator
     {
         public bool Validate(AddFlightRequest request)
-        { 
-
-           //  how to use this?
-
-            //var s = new RequestPropertiesAreNotNullValidator();
-
-            /*if (s.Validate(request))
-            {*/
+        {
             if (request == null || string.IsNullOrEmpty(request.Carrier) ||
                 string.IsNullOrEmpty(request.DepartureTime) ||
                 string.IsNullOrEmpty(request.ArrivalTime) ||
                 request.To == null ||
                 request.From == null ||
-
                 string.IsNullOrEmpty(request.To?.AirportName) ||
                 string.IsNullOrEmpty(request.To?.City) ||
                 string.IsNullOrEmpty(request.To?.Country) ||
@@ -30,8 +22,8 @@ namespace FlightPlannerC3.Services.Validators
             {
                 return false;
             }
-            return !(DateTime.Parse(request.ArrivalTime) <= DateTime.Parse(request.DepartureTime));
-            
+
+            return DateTime.Parse(request.ArrivalTime) > DateTime.Parse(request.DepartureTime);
         }
 
         public bool Validate(SearchFlightsRequest request)

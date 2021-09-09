@@ -3,7 +3,7 @@ using FlightPlannerC3.Core.Services;
 
 namespace FlightPlannerC3.Services.Validators
 {
-    public class CarrierInputValidator: IInputValidator
+    public class CarrierInputValidator : IInputValidator
     {
         public bool Validate(AddFlightRequest request)
         {
