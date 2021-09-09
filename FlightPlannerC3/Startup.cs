@@ -44,7 +44,6 @@ namespace FlightPlannerC3
             services.AddTransient<IInputValidator, AirportToInputValidator>();
             services.AddTransient<IInputValidator, AirportCodesInputValidator>();
             services.AddTransient<IInputValidator, CarrierInputValidator>();
-            services.AddTransient<IIsNotInStorageValidator, IsNotInStorageValidator>();
             services.AddTransient<IInputValidator, IsToAndFromAirportsDifferent>();
             services.AddTransient<IAirportService, AirportService>();
 

@@ -15,17 +15,15 @@ namespace FlightPlannerC3.Controllers
     public class AdminApiController : ControllerBase
     {
         public AdminApiController(IFlightService flightService, IEnumerable<IInputValidator> validators,
-            FlightPlannerDbContext context, IIsNotInStorageValidator isNotInStorageValidator)
+            FlightPlannerDbContext context)
         {
             _flightService = flightService;
             _validators = validators;
             _context = context;
-            _isNotInStorageValidator = isNotInStorageValidator;
         }
 
         private readonly IFlightService _flightService;
         private readonly FlightPlannerDbContext _context;
-        private readonly IIsNotInStorageValidator _isNotInStorageValidator;
         private readonly IEnumerable<IInputValidator> _validators;
 
         [Route("{id:int}")]
@@ -51,6 +49,16 @@ namespace FlightPlannerC3.Controllers
                 return BadRequest();
             }
 
+            var k = _context.Flights.FirstOrDefault(
+                f => f.ArrivalTime == newFlight.ArrivalTime &&
+                     f.DepartureTime == newFlight.DepartureTime &&
+                     f.Carrier.ToLower().Trim() == newFlight.Carrier.ToLower().Trim() &&
+                     f.From.AirportName.ToLower().Trim() == newFlight.From.AirportName.ToLower().Trim());
+            if (k != null)
+            {
+                return Conflict();
+            }
+
             var flightToBeAdded = new Flight
             {
                 ArrivalTime = newFlight.ArrivalTime,
@@ -69,11 +77,6 @@ namespace FlightPlannerC3.Controllers
                     AirportName = newFlight.To.AirportName
                 }
             };
-
-            if (_isNotInStorageValidator.Validate(newFlight) == false)
-            {
-                return Conflict();
-            }
 
             if (_validators.All(v => v.Validate(newFlight)))
             {

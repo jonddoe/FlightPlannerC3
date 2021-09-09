@@ -31,7 +31,10 @@ namespace FlightPlannerC3.Services
         public async Task DeleteAirportById(int id)
         {
             var airport = _context.Airports.FirstOrDefault(f => f.Id == id);
-            if (airport != null) _context.Airports.Remove(airport);
+            if (airport != null)
+            {
+                _context.Airports.Remove(airport);
+            };
             await _context.SaveChangesAsync();
         }
 
